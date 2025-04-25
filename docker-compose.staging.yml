@@ -1,0 +1,29 @@
+services:
+  oracle-staging:
+    image: gvenzl/oracle-xe:21-slim
+    container_name: oracle-staging
+    ports:
+      - "1522:1521"
+    environment:
+      ORACLE_PASSWORD: staging123
+      APP_USER: oracle_staging
+      APP_USER_PASSWORD: staging123
+    volumes:
+      - oracle-staging-data:/opt/oracle/oradata
+  
+
+  coleta-app-staging:
+    image: coleta-app-image
+    container_name: app-staging
+    depends_on:
+      - oracle-staging
+    ports:
+      - "8082:8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=staging
+      - SPRING_DATASOURCE_URL=jdbc:oracle:thin:@//oracle-staging:1522/XEPDB1
+      - SPRING_DATASOURCE_USERNAME=oracle_staging
+      - SPRING_DATASOURCE_PASSWORD=staging123
+
+volumes:
+  oracle-staging-data:

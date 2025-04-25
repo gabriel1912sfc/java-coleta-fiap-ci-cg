@@ -11,7 +11,7 @@ services:
     volumes:
       - oracle-data:/opt/oracle/oradata
     healthcheck:
-      test: ["CMD", "sqlplus", "-L", "teste_user/senhaForte123@localhost/xepdb1", "@healthcheck.sql"]
+      test: ["CMD", "sqlplus", "-L", "teste_user/senhaForte123@localhost/XEPDB1", "@healthcheck.sql"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -25,7 +25,7 @@ services:
       - "8081:8081"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_DATASOURCE_URL=jdbc:oracle:thin:@//oracle-db:1521/xepdb1
+      - SPRING_DATASOURCE_URL=jdbc:oracle:thin:@//oracle-db:1521/XEPDB1
       - SPRING_DATASOURCE_USERNAME=teste_user
       - SPRING_DATASOURCE_PASSWORD=senhaForte123
     volumes:
