@@ -1,0 +1,55 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - staging
+      - main
+
+env:
+  IMAGE_NAME: coleta-app-image
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Build do projeto com Maven
+        run: mvn clean package -DskipTests
+
+      - name: Build da imagem Docker
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME:${{ github.sha }} .
+
+      - name: Login no Docker Hub
+        run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+
+      - name: Push da imagem para Docker Hub
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME:${{ github.sha }}
+
+  deploy-staging:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: github.ref == 'refs/heads/staging'
+    steps:
+      - name: Deploy automático para Staging (Azure App Service)
+        run: |
+          echo "A imagem foi enviada. Reinicie o App Service de STAGING manualmente ou configure atualização contínua pelo Docker Hub."
+
+  deploy-production:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Deploy automático para Produção (Azure App Service)
+        run: |
+          echo "A imagem foi enviada. Reinicie o App Service de PRODUÇÃO manualmente ou configure atualização contínua pelo Docker Hub."
