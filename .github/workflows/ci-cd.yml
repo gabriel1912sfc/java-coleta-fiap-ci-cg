@@ -3,63 +3,53 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - main
       - staging
+      - main
+
+env:
+  IMAGE_NAME: coleta-app-image
 
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
-    steps:
-      - name: Check out the code
-        uses: actions/checkout@v2
 
-      - name: Set up JDK
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
+
+      - name: Setup Java
         uses: actions/setup-java@v3
         with:
-              java-version: '21'
-              distribution: 'temurin'
+          java-version: '21'
+          distribution: 'temurin'
 
-      - name: Build with Maven
+      - name: Build do projeto com Maven
         run: mvn clean package -DskipTests
 
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-
-      - name: Cache Docker layers
-        uses: actions/cache@v3
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
-
-      - name: Build Docker image
+      - name: Build da imagem Docker
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/coleta-app-image:${{ github.sha }} .
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME:${{ github.sha }} .
 
-      - name: Push Docker image to Docker Hub
-        run: |
-          echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-          docker push ${{ secrets.DOCKER_USERNAME }}/coleta-app-image:${{ github.sha }}
-  
-  
-  deploy:
+      - name: Login no Docker Hub
+        run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+
+      - name: Push da imagem para Docker Hub
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME:${{ github.sha }}
+
+  deploy-staging:
     runs-on: ubuntu-latest
-    needs: build
+    needs: build-and-push
+    if: github.ref == 'refs/heads/staging'
     steps:
-      - name: Check out the code
-        uses: actions/checkout@v2
-
-      # Deploy para o ambiente de Staging
-      - name: Deploy to Staging
+      - name: Deploy automático para Staging (Azure App Service)
         run: |
-          # Conectar no servidor de staging e realizar o deploy com Docker Compose
-          ssh user@staging-server "docker pull coleta-app-image:${{ github.sha }} && docker-compose -f docker-compose.staging.yml up -d"
+          echo "A imagem foi enviada. Reinicie o App Service de STAGING manualmente ou configure atualização contínua pelo Docker Hub."
 
-      # Deploy para o ambiente de Produção (trigger manual)
-      - name: Deploy to Production (manual trigger)
-        if: github.ref == 'refs/heads/main'
+  deploy-production:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Deploy automático para Produção (Azure App Service)
         run: |
-          # Conectar no servidor de produção e realizar o deploy com Docker Compose
-          ssh user@prod-server "docker pull coleta-app-image:${{ github.sha }} && docker-compose -f docker-compose.yml up -d"
+          echo "A imagem foi enviada. Reinicie o App Service de PRODUÇÃO manualmente ou configure atualização contínua pelo Docker Hub."
