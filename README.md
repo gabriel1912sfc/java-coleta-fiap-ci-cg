@@ -16,10 +16,7 @@ Esta aplicação é uma **API RESTful** para **cadastro e consulta de pedidos de
 
 ## 🗂️ Funcionalidades
 
-- Cadastro de coletas seletivas
-- Consulta de coletas por ID ou listagem geral
-- Registro e autenticação de usuários
-- Exclusão de registros de coleta
+- Operações CRUD de pedidos de Coleta e de Usuários do sistema
 
 ---
 
@@ -27,19 +24,23 @@ Esta aplicação é uma **API RESTful** para **cadastro e consulta de pedidos de
 
 ### 📦 Coletas
 
-| Método | Rota                            | Descrição                        |
-|--------|----------------------------------|----------------------------------|
-| GET    | `/api/coleta/coletas`           | Lista todas as coletas           |
-| GET    | `/api/coleta/{idcoleta}`        | Consulta uma coleta por ID       |
-| POST   | `/api/coleta/create`            | Cria um novo pedido de coleta    |
-| DELETE | `/api/coleta/{id}`              | Deleta uma coleta                |
+| Método | Rota                      | Descrição                     |
+|--------|---------------------------|-------------------------------|
+| GET    | `/api/coleta/coletas`     | Lista todas as coletas        |
+| GET    | `/api/coleta/{id}`        | Consulta uma coleta por ID    |
+| POST   | `/api/coleta/create`      | Cria um novo pedido de coleta |
+| PUT    | `/api/coleta/update/{id}` | Atualiza um pedido de coleta  |
+| DELETE | `/api/coleta/{id}`        | Deleta uma coleta             |
 
 ### 👤 Usuário
 
-| Método | Rota               | Descrição                      |
-|--------|--------------------|--------------------------------|
-| POST   | `/auth/register`   | Registro de novo usuário       |
-| POST   | `/auth/login`      | Autenticação e geração de token|
+| Método | Rota                               | Descrição                       |
+|--------|------------------------------------|---------------------------------|
+| GET    | `/api/coleta/user/users`           | Lista todos os usuários         |
+| GET    | `/api/coleta/user/{userId}`        | Consulta um usuário por ID      |
+| POST   | `/api/coleta/user/create`          | Cria um novo usuário            |
+| PUT    | `/api/coleta/user/update/{userId}` | Atualiza os dados de um usuário |
+| DELETE | `/api/coleta/user/{userId}`        | Deleta um usuário               |
 
 ---
 
@@ -54,4 +55,5 @@ Esta aplicação é uma **API RESTful** para **cadastro e consulta de pedidos de
 Fique à vontade para contribuir em melhorias para o projeto! 😄
 
 ---
+
 

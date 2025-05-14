@@ -31,7 +31,7 @@ public class Coleta {
 
     @Column(name = "data_coleta")
     private String dateColeta;
-    private String adress;
+    private String address;
 
     @Column(name = "type_of_residue")
     private String typeOfResidue;
